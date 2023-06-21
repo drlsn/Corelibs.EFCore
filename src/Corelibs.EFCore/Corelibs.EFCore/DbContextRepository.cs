@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Corelibs.EFCore
 {
-    public class DbContextRepository<TEntity> : IRepository<TEntity>, IReadRepository
-        where TEntity : class, IEntity
+    public class DbContextRepository<TEntity, TEntityId> : IRepository<TEntity, TEntityId>, IReadRepository<TEntityId>
+        where TEntity : class, IEntity<TEntityId>
     {
         private readonly DbContext _dbContext;
 
@@ -20,12 +20,12 @@ namespace Corelibs.EFCore
             throw new NotImplementedException();
         }
 
-        public async Task<Result> Delete(string id)
+        public async Task<Result> Delete(TEntityId id)
         {
             var result = Result.Success();
 
             var set = GetSet();
-            TEntity entity = await set.FirstOrDefaultAsync(e => e.ID == id);
+            TEntity entity = await set.FirstOrDefaultAsync(e => e.Id.ToString() == id.ToString());
             if (entity == null)
                 return result.Fail();
 
@@ -58,30 +58,30 @@ namespace Corelibs.EFCore
             throw new NotImplementedException();
         }
 
-        public async Task<Result<TEntity>> GetBy(string id)
+        public async Task<Result<TEntity>> GetBy(TEntityId id)
         {
             var result = Result<TEntity>.Success();
 
             var set = GetSet();
-            TEntity entity = await set.FirstOrDefaultAsync(e => e.ID == id);
+            TEntity entity = await set.FirstOrDefaultAsync(e => e.Id.ToString() == id.ToString());
             if (entity == null)
                 return result;
 
             return result.With(entity);
         }
 
-        public async Task GetBy(string id, Result result)
+        public async Task GetBy(TEntityId id, Result result)
         {
             var resultLocal = await GetBy(id);
             result.Add(resultLocal);
         }
 
-        public async Task<Result<TEntity[]>> GetBy(IList<string> ids)
+        public async Task<Result<TEntity[]>> GetBy(IList<TEntityId> ids)
         {
             var result = Result<TEntity[]>.Success();
 
             var set = GetSet();
-            TEntity[] entities = await set.Where(e => ids.Contains(e.ID)).ToArrayAsync();
+            TEntity[] entities = await set.Where(e => ids.Contains(e.Id)).ToArrayAsync();
             if (entities == null)
                 return result.Fail();
 
@@ -97,7 +97,7 @@ namespace Corelibs.EFCore
         {
             var set = GetSet();
 
-            var entity = await set.FindAsync(item.ID);
+            var entity = await set.FindAsync(item.Id.ToString());
             if (entity == null)
                 await set.AddAsync(item);
 
