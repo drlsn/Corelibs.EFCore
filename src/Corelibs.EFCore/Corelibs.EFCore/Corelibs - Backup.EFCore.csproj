@@ -1,12 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>Corelibs.EFCore</Title>
-    <Authors>Tharius</Authors>
-    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
